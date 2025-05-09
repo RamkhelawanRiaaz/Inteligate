@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+    <style>
+        #videoElement {
+            width: 100%;
+            height: auto;
+        }
+        #canvasOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+    </style>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <div class="text-center">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Project Image" class="img-fluid">
+            </div>
+            <h1>Register</h1>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul>
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+            {% endwith %}
+            <div class="video-container">
+                <video id="videoElement" autoplay></video>
+                <canvas id="canvasOverlay"></canvas>
+            </div>
+            <br>
+            <button onclick="captureImage()">Capture Image</button>
+            <br><br>
+            <form action="/register" method="post">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+                <input type="hidden" id="faceData" name="faceData">
+                <br><br>
+
+                <!-- Additional fields for registration -->
+                <h3>Account user information</h3>
+                <div class="form-group">
+                    <label for="register-projectName">Project Name</label>
+                    <input type="text" class="form-control" id="register-projectName" name="projectName" placeholder="Enter project name" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-voornaam">First Name</label>
+                    <input type="text" class="form-control" id="register-voornaam" name="voornaam" placeholder="Enter first name" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-achternaam">Last Name</label>
+                    <input type="text" class="form-control" id="register-achternaam" name="achternaam" placeholder="Enter last name" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-username">Username</label>
+                    <input type="text" class="form-control" id="register-username" name="username" placeholder="Enter username" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-wachtwoord">Password</label>
+                    <input type="password" class="form-control" id="register-wachtwoord" name="wachtwoord" placeholder="Enter password" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" class="form-control" id="register-email" name="email" placeholder="Enter email" required>
+                </div>
+
+                <!--first car info-->
+                <hr>
+                <h3>First car information</h3>
+                <div class="form-group">
+                    <label for="register-Kentekennummer">Kentekennummer</label>
+                    <input type="text" class="form-control" id="register-Kentekennummer" name="Kentekennummer" placeholder="Enter last Kentekennummer" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-Merk">Merk</label>
+                    <input type="text" class="form-control" id="register-Merk" name="Merk" placeholder="Enter Merk" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-Model">Model</label>
+                    <input type="text" class="form-control" id="register-Model" name="Model" placeholder="Enter Model" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-Kleur">Kleur</label>
+                    <input type="text" class="form-control" id="register-Kleur" name="Kleur" placeholder="Enter Kleur" required>
+                </div>
+
+                <input type="submit" value="Register">
+            </form>
+        </div>
+    </div>
+
+    <script>
+        var video = document.getElementById('videoElement');
+        var canvasOverlay = document.getElementById('canvasOverlay');
+        var ctx = canvasOverlay.getContext('2d');
+
+        function startVideoStream() {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(stream) {
+                    video.srcObject = stream;
+                    video.play();
+                })
+                .catch(function(err) {
+                    console.log("An error occurred: " + err);
+                });
+        }
+
+        function drawOverlay() {
+            ctx.clearRect(0, 0, canvasOverlay.width, canvasOverlay.height);
+            var centerX = canvasOverlay.width / 2;
+            var centerY = canvasOverlay.height / 2;
+            var radius = 100; // Adjust the radius as needed
+
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = 'green';
+            ctx.stroke();
+        }
+
+        function captureImage() {
+            var canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            var imageDataURL = canvas.toDataURL('image/jpeg');
+            document.getElementById('faceData').value = imageDataURL;
+        }
+
+        window.onload = function() {
+            startVideoStream();
+            canvasOverlay.width = video.offsetWidth;
+            canvasOverlay.height = video.offsetHeight;
+            drawOverlay();
+        }
+
+        window.onresize = function() {
+            canvasOverlay.width = video.offsetWidth;
+            canvasOverlay.height = video.offsetHeight;
+            drawOverlay();
+        }
+    </script>
+</body>
+</html>

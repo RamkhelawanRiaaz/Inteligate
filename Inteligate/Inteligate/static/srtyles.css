@@ -1,0 +1,77 @@
+body {
+    background: #000;
+    color: #fff;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    max-width: 500px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.8);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.form-container {
+    text-align: center;
+}
+
+.form-container h2 {
+    margin-bottom: 20px;
+    color: #FD6B15;
+}
+
+.form-container input,
+.form-container button {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: none;
+}
+
+.form-container input {
+    background-color: #333;
+    color: #fff;
+}
+
+.form-container button {
+    background-color: #FD6B15;
+    color: #000;
+    cursor: pointer;
+}
+
+.form-container button:hover {
+    background-color: #F69312;
+}
+
+.form-container p a {
+    color: #FD6B15;
+    text-decoration: none;
+}
+
+.form-container p a:hover {
+    text-decoration: underline;
+}
+
+.table th, .table td {
+    color: #fff;
+    background-color: #333;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #444;
+}
+
+.table-striped tbody tr:nth-of-type(even) {
+    background-color: #555;
+}
+
+.table thead th {
+    background-color: #FD6B15;
+}
+
+.table-container {
+    margin-bottom: 30px; /* Adjust this value as needed */
+}

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .table-container {
+            margin-bottom: 50px; /* Increase bottom margin for more space */
+            padding-top: 20px;   /* Add padding at the top for more spacing */
+        }
+        .hide-id {
+            display: none; /* Hide the ID columns */
+        }
+    </style>
+</head>
+<body>
+    <div class="text-center">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Project Image" class="img-fluid">
+    </div>
+    <div class="container">
+        <div class="form-container">
+            <h2 class="text-center">Dashboard</h2>
+            <h4 class="text-center">Welcome, {{ username }}</h4>
+            <button class="btn btn-primary btn-block" onclick="location.href='{{ url_for('register_car') }}'">Register Car</button>
+            <button class="btn btn-primary btn-block" onclick="location.href='{{ url_for('register_person') }}'">Register Person</button>
+            <button class="btn btn-danger btn-block" onclick="location.href='{{ url_for('logout') }}'">Sign Out</button>
+            <hr>
+            <div class="row">
+                <div class="col-md-6 table-container">
+                    <h3 class="text-center">Registered Subperson Accounts</h3>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th class="hide-id">PersonID</th>
+                                <th>Owner's Full Name</th>
+                                <th>PersonVoornaam</th>
+                                <th>PersonAchternaam</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for subperson in subperson_accounts %}
+                            <tr>
+                                <td class="hide-id">{{ subperson.PersonID }}</td>
+                                <td>{{ subperson.OwnerFullName }}</td>
+                                <td>{{ subperson.SubPersonVoornaam }}</td>
+                                <td>{{ subperson.SubPersonAchternaam }}</td>
+                                <td>
+                                    <button class="btn btn-danger" onclick="confirmDelete('subperson', {{ subperson.PersonID }})">Delete</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-6 table-container">
+                    <h3 class="text-center">Registered Account Cars</h3>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th class="hide-id">AutoID</th>
+                                <th>Owner's Full Name</th>
+                                <th>Kentekennummer</th>
+                                <th>Automerk</th>
+                                <th>Model</th>
+                                <th>Kleur</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for car in account_cars %}
+                            <tr>
+                                <td class="hide-id">{{ car.AutoID }}</td>
+                                <td>{{ car.OwnerFullName }}</td>
+                                <td>{{ car.Kentekennummer }}</td>
+                                <td>{{ car.automerk }}</td>
+                                <td>{{ car.model }}</td>
+                                <td>{{ car.kleur }}</td>
+                                <td>
+                                    <button class="btn btn-danger" onclick="confirmDelete('car', {{ car.AutoID }})">Delete</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function confirmDelete(type, id) {
+            if (confirm('Are you sure you want to delete this record?')) {
+                fetch(`/delete-${type}/${id}`, { method: 'DELETE' })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('Failed to delete the record.');
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

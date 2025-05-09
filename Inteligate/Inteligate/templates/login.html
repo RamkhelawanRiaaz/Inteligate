@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <style>
+        #videoElement {
+            width: 100%;
+            height: auto;
+        }
+        #canvasOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+    </style>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <div class="text-center">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Project Image" class="img-fluid">
+            </div>
+            <h1 style="color: rgb(175, 120, 16);" class="text-center"><i>Login</i></h1>
+            <h2 class="text-center"><i>Welcome to Inteligate webapp</i></h2>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul id="flash-messages" class="d-none">
+                {% for category, message in messages %}
+                <li class="alert alert-{{ category }}">{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+            {% endwith %}
+            <div class="video-container">
+                <video id="videoElement" autoplay></video>
+                <canvas id="canvasOverlay"></canvas>
+            </div>
+            <br>
+            <button class="btn btn-primary" onclick="captureImage()">Capture Image</button>
+            <br><br>
+            <form action="/login" method="post">
+                <div class="form-group">
+                    <label for="login-username">Username</label>
+                    <input type="text" class="form-control" id="login-username" name="username" placeholder="Enter username" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-wachtwoord">Wachtwoord</label>
+                    <input type="password" class="form-control" id="login-wachtwoord" name="wachtwoord" placeholder="Enter wachtwoord" required>
+                </div>
+                <input type="hidden" id="faceData" name="faceData">
+                <br><br>
+                <input type="submit" class="btn btn-success" value="Login">
+            </form>
+        </div>
+    </div>
+    <script>
+        var video = document.getElementById('videoElement');
+        var canvasOverlay = document.getElementById('canvasOverlay');
+        var ctx = canvasOverlay.getContext('2d');
+
+        function startVideoStream() {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(stream) {
+                    video.srcObject = stream;
+                    video.play();
+                })
+                .catch(function(err) {
+                    console.log("An error occurred: " + err);
+                });
+        }
+
+        function drawOverlay() {
+            ctx.clearRect(0, 0, canvasOverlay.width, canvasOverlay.height);
+            var centerX = canvasOverlay.width / 2;
+            var centerY = canvasOverlay.height / 2;
+            var radius = 100; // Adjust the radius as needed
+
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = 'green';
+            ctx.stroke();
+        }
+
+        function captureImage() {
+            var canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            var imageDataURL = canvas.toDataURL('image/jpeg');
+            document.getElementById('faceData').value = imageDataURL;
+        }
+
+        window.onload = function() {
+            startVideoStream();
+
+            // Display flash messages using JavaScript
+            var flashMessages = document.getElementById('flash-messages');
+            if (flashMessages) {
+                flashMessages.classList.remove('d-none');
+                var messages = flashMessages.querySelectorAll('li');
+                messages.forEach(function(message) {
+                    alert(message.textContent);
+                });
+            }
+
+            // Adjust canvas size and draw overlay
+            canvasOverlay.width = video.offsetWidth;
+            canvasOverlay.height = video.offsetHeight;
+            drawOverlay();
+        }
+
+        window.onresize = function() {
+            // Adjust canvas size on window resize
+            canvasOverlay.width = video.offsetWidth;
+            canvasOverlay.height = video.offsetHeight;
+            drawOverlay();
+        }
+    </script>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
